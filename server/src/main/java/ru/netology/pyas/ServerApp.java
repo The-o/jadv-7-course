@@ -9,13 +9,26 @@ import ru.netology.pyas.chatprotocol.Protocol;
 import ru.netology.pyas.chatprotocol.SimpleProtocol;
 import ru.netology.pyas.logger.FileLogger;
 import ru.netology.pyas.server.Server;
+import ru.netology.pyas.settings.Settings;
+import ru.netology.pyas.settings.SettingsReader;
 
 public class ServerApp {
 
+    private final static String SETTINGS_FILE = "settings.txt";
+
     public static void main(String[] args) {
         Protocol protocol = new SimpleProtocol();
-        try (FileLogger logger = new FileLogger("file.log")) {
-            new Server(8080, protocol, logger).run();
+        Settings settings;
+        try {
+            SettingsReader settingsReader = new SettingsReader(SETTINGS_FILE);
+            settings = settingsReader.read();
+        } catch (IOException e) {
+            System.out.println("Ошибка чтения файла настроек:" + e.getMessage());
+            return;
+        }
+
+        try (FileLogger logger = new FileLogger(settings.logfile)) {
+            new Server(settings.port, protocol, logger).run();
         } catch (IOException e) {
             System.out.println("Ошибка открытия файла логов:" + e.getMessage());
         }
