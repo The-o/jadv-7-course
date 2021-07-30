@@ -3,18 +3,21 @@
  */
 package ru.netology.pyas;
 
+import java.io.IOException;
+
 import ru.netology.pyas.chatprotocol.Protocol;
 import ru.netology.pyas.chatprotocol.SimpleProtocol;
 import ru.netology.pyas.logger.FileLogger;
-import ru.netology.pyas.logger.Logger;
 import ru.netology.pyas.server.Server;
 
 public class ServerApp {
 
     public static void main(String[] args) {
         Protocol protocol = new SimpleProtocol();
-        Logger logger = new FileLogger();
-
-        new Server(8080, protocol, logger).run();
+        try (FileLogger logger = new FileLogger("file.log")) {
+            new Server(8080, protocol, logger).run();
+        } catch (IOException e) {
+            System.out.println("Ошибка открытия файла логов:" + e.getMessage());
+        }
     }
 }

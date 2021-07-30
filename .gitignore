@@ -12,3 +12,5 @@ bin
 
 /gradle
 /gradlew*
+
+file.log
