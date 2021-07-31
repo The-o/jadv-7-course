@@ -31,7 +31,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass = 'ru.netology.pyas.Server'
+    mainClass = 'ru.netology.pyas.ServerApp'
 }
 
 tasks.named('test') {

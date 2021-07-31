@@ -22,6 +22,12 @@ public class ServerRunner implements Runnable {
         } catch (IOException e) {
             System.err.println("Ошибка подключения: " + e.getMessage());
         }
+
+        try {
+            server.disconnectClient(client);
+        } catch (IOException e) {
+            System.err.println("Ошибка отключения клиента: " + e.getMessage());
+        }
     }
 
 }

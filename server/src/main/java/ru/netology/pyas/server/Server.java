@@ -38,26 +38,15 @@ public class Server {
             if (clientSocket == null) {
                 continue;
             }
-            Client client;
-            try {
-                client = new Client(clientSocket);
-            } catch (IOException e) {
+
+            Client client = initClient(clientSocket);
+            if (client == null) {
                 continue;
             }
+
             ServerRunner serverRunner = new ServerRunner(this, client);
             executor.execute(serverRunner);
         }
-    }
-
-    private Socket acceptIncomingConnection(ServerSocket serverSocket) {
-        Socket clientSocket;
-        try {
-            clientSocket = serverSocket.accept();
-        } catch (IOException e) {
-            System.err.println("Ошибка открытия сокета клиента: " + e.getMessage());
-            return null;
-        }
-        return clientSocket;
     }
 
     private ServerSocket openServerSocket() {
@@ -71,13 +60,42 @@ public class Server {
         return serverSocket;
     }
 
+    private Socket acceptIncomingConnection(ServerSocket serverSocket) {
+        Socket clientSocket;
+        try {
+            clientSocket = serverSocket.accept();
+        } catch (IOException e) {
+            System.err.println("Ошибка открытия сокета клиента: " + e.getMessage());
+            return null;
+        }
+        return clientSocket;
+    }
+
+    private Client initClient(Socket clientSocket) {
+        try {
+            return new Client(clientSocket);
+        } catch (IOException e) {
+            System.err.println("Ошибка инициализации клиента: " + e.getMessage());
+            closeClientSocket(clientSocket);
+            return null;
+        }
+    }
+
+    private void closeClientSocket(Socket clientSocket) {
+        try {
+            clientSocket.close();
+        } catch (IOException e) {
+            System.err.println("Ошибка закрытия сокета клиента: " + e.getMessage());
+        }
+    }
+
     private void registerClient(String name, Client client) {
         client.setName(name);
         clients.put(name, client);
         sendMessageToAllClients(protocol.getNotifyNewClientMessage(name));
     }
 
-    private void disconnectClient(Client client) throws IOException {
+    public void disconnectClient(Client client) throws IOException {
         String name = client.getName();
         clients.remove(name);
         client.disconnect();
@@ -105,7 +123,6 @@ public class Server {
     public boolean processMessage(Client client) throws IOException {
         String message = client.readMessage();
         if (message == null) {
-            disconnectClient(client);
             return false;
         }
         sendMessageToAllClients(protocol.getClientMessage(client.getName(), message));
