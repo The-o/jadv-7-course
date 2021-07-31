@@ -8,4 +8,4 @@
  */
 
 rootProject.name = 'jadv-7-course'
-include('server', 'logger', 'protocol', 'settings')
+include('server', 'logger', 'protocol', 'settings', 'client')

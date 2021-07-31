@@ -1,0 +1,3 @@
+HIOST = localhost
+PORT = 8080
+LOGFILE = file.log
